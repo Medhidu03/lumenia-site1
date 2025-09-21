@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title><%= serverName %> - Dashboard</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #1e1e2f;
+    color: #fff;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #tsparticles {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .dashboard-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .left-panel, .right-panel {
+    flex: 1;
+    background: rgba(0,0,0,0.6);
+    border-radius: 15px;
+    padding: 25px;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  h1, h2 { color: #ffd700; }
+  h2 { margin-top: 20px; margin-bottom: 10px; }
+
+  .user-info { text-align: center; }
+  .user-info img { border-radius: 50%; width: 150px; height: 150px; margin-bottom: 15px; border: 3px solid #ffd700; }
+  .user-info p { margin: 5px 0; }
+
+  .links button, .btn-logout {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .links button { background: #7289da; color: #fff; }
+  .links button:hover { transform: scale(1.05); background: #5b6eae; }
+
+  .btn-logout {
+    background: linear-gradient(45deg, #ff4d4d, #ff0000);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255,0,0,0.7);
+  }
+  .btn-logout:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 0 30px rgba(255,0,0,1); }
+
+  ul { padding-left: 20px; }
+  .section {
+    margin-bottom: 25px;
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  .section:hover { transform: translateY(-5px); box-shadow: 0 0 35px rgba(255, 215, 0, 0.6); }
+
+  .stats-box { background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+
+  /* Easter egg dinosaure */
+  #dino-egg {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2em;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    z-index: 10;
+  }
+  #dino-egg:hover { transform: scale(1.3) rotate(-10deg); }
+
+  /* Fenêtre du jeu */
+  #dino-game-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #000;
+    padding: 20px;
+    border-radius: 15px;
+    z-index: 100;
+    text-align: center;
+  }
+  #dino-game {
+    background: #fff;
+    width: 600px;
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px;
+    margin: auto;
+  }
+  .dino { width: 40px; height: 40px; background: #00ffe0; position: absolute; bottom: 0; left: 50px; border-radius: 5px; }
+  .cactus { width: 20px; height: 40px; background: #ff4d4d; position: absolute; bottom: 0; right: 0; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="tsparticles"></div>
+
+<div class="dashboard-container">
+
+  <!-- Colonne gauche : infos serveur et conseils -->
+  <div class="left-panel">
+    <h1>Bienvenue sur <%= serverName %></h1>
+
+    <div class="section">
+      <h2>Conseils généraux</h2>
+      <ul>
+        <li>Participe aux salons et discussions du serveur</li>
+        <li>Respecte la communauté et les règles</li>
+        <li>Active les notifications pour ne rien manquer</li>
+        <li>Découvre les rôles spéciaux et fonctionnalités</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Liens utiles</h2>
+      <div class="links">
+        <button onclick="window.open('https://discord.gg/mzf7wrHjB5','_blank')">Discord</button>
+        <button onclick="window.open('https://www.twitch.tv/klyze_03','_blank')">Twitch</button>
+        <button onclick="window.open('https://www.paypal.com/donate?hosted_button_id=TON_ID','_blank')">Faire un don</button>
+        <button onclick="window.open('https://disboard.org/server/TON_ID/bump','_blank')">Bump le serveur</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Informations utilisateur</h2>
+      <ul>
+        <li>Nom : <strong><%= user.username %>#<%= user.discriminator %></strong></li>
+        <li>Badges : <strong><%= user.public_flags || 'Aucun' %></strong></li>
+        <li>Rôle principal : <strong><%= user.roles ? user.roles[0] : 'Aucun' %></strong></li>
+        <li>Conseils personnalisés : <strong>Participez aux salons VIP et activez vos notifications pour ne rien manquer.</strong></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Statistiques générales</h2>
+      <div class="stats-box">
+        <p>Membres total : 52</p>
+        <p>Membres en ligne actuellement : 46</p>
+        <p>Salons actifs : 5</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne droite : infos utilisateur -->
+  <div class="right-panel">
+    <div class="user-info">
+      <img src="<%= user.avatar ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png' : '/default-avatar.png' %>" alt="Avatar Discord">
+      <h2><%= user.username %>#<%= user.discriminator %></h2>
+      <p><strong>Compte Discord créé le :</strong> <%= creationDate.toLocaleDateString() %> à <%= creationDate.toLocaleTimeString() %></p>
+      <p><strong>Statut :</strong> <%= user.status || 'Inconnu' %></p>
+      <p><strong>Badges :</strong> <%= user.public_flags || 'Aucun' %></p>
+
+      <div class="section">
+        <h2>Infos supplémentaires</h2>
+        <p><strong>Serveur d'origine :</strong> Lumenia</p>
+      </div>
+
+      <!-- Bouton Se Déconnecter -->
+      <button class="btn-logout" onclick="window.location='/logout'">Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="user-info">
+    <img src="<%= user.avatar ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png' : '/default-avatar.png' %>" alt="Avatar Discord">
+    <h2><%= user.username %>#<%= user.discriminator %></h2>
+    <p><strong>Compte Discord créé le :</strong> <%= creationDate.toLocaleDateString() %> à <%= creationDate.toLocaleTimeString() %></p>
+    <p><strong>Statut :</strong> <%= user.status || 'Inconnu' %></p>
+    <p><strong>Badges :</strong> <%= user.public_flags || 'Aucun' %></p>
+
+    <div class="section">
+      <h2>Infos supplémentaires</h2>
+      <p><strong>Heure de connexion :</strong> <%= new Date().toLocaleTimeString() %></p>
+      <p><strong>Serveur d'origine :</strong> Lumenia</p>
+    </div>
+
+    <!-- Section amis Discord -->
+    <div class="section">
+      <h2>Amis Discord (max 15)</h2>
+      <ul>
+        <% if(user.friends && user.friends.length > 0) { %>
+          <% user.friends.slice(0,15).forEach(friend => { %>
+            <li>
+              <img src="https://cdn.discordapp.com/avatars/<%= friend.id %>/<%= friend.avatar %>.png" alt="Avatar" style="width:24px; height:24px; border-radius:50%; vertical-align:middle;">
+              <%= friend.username %>#<%= friend.discriminator %>
+            </li>
+          <% }) %>
+        <% } else { %>
+          <li>Aucun ami à afficher</li>
+        <% } %>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- Easter Egg Dinosaure -->
+<div id="dino-egg">🦖</div>
+<div id="dino-game-container">
+  <p>Appuie sur espace pour sauter !</p>
+  <div id="dino-game">
+    <div class="dino" id="dino"></div>
+    <div class="cactus" id="cactus"></div>
+  </div>
+  <button onclick="closeDino()">Fermer le jeu</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="/script.js"></script>
+<script>
+  // Particules
+  tsParticles.load("tsparticles", {
+    fpsLimit: 60,
+    interactivity: { events: { onHover: { enable: true, mode: "repulse" } }, modes: { repulse: { distance: 120, duration: 0.4 } } },
+    particles: { color: { value: "#ffd700" }, links: { enable: true, color: "#ffd700", distance: 120 }, move: { enable: true, speed: 2, outModes: { default: "bounce" } }, number: { value: 50, density: { enable: true, area: 800 } }, shape: { type: "circle" }, size: { value: { min: 2, max: 4 } } },
+    detectRetina: true
+  });
+
+<!-- Easter Egg Dinosaure -->
+<div id="dino-egg">🦖</div>
+
+</body>
+</html>

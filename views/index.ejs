@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title><%= serverName %> - Accueil</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  #tsparticles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+  }
+
+  .home-container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 3.5em;
+    color: #00ffe0;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: #f0f0f0;
+  }
+
+  .btn, .btn-connect {
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 15px 35px;
+    margin: 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: all 0.4s ease;
+  }
+
+  .btn-connect {
+    background: linear-gradient(45deg, #00ffe0, #0077ff);
+    box-shadow: 0 0 10px rgba(0,255,224,0.7);
+  }
+
+  .btn-connect:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 0 25px rgba(0,255,224,1);
+  }
+
+  /* Liens stylés individuellement */
+  .btn-twitch { background: linear-gradient(45deg, #9146FF, #6E33CC); box-shadow: 0 0 15px rgba(145,70,255,0.7);}
+  .btn-discord { background: linear-gradient(45deg, #7289DA, #4E5AA0); box-shadow: 0 0 15px rgba(114,137,218,0.7);}
+  .btn-donate { background: linear-gradient(45deg, #FF5F6D, #FFC371); box-shadow: 0 0 15px rgba(255,95,109,0.7);}
+  .btn-bump { background: linear-gradient(45deg, #00C853, #B2FF59); box-shadow: 0 0 15px rgba(0,200,83,0.7);}
+  .btn-twitch:hover, .btn-discord:hover, .btn-donate:hover, .btn-bump:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 0 30px rgba(0,255,224,0.9);
+  }
+
+  .links {
+    margin-top: 25px;
+  }
+
+  .extra-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 50px;
+  }
+
+  .section {
+    background: rgba(255,255,255,0.05);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0,255,224,0.3);
+    transition: all 0.3s ease;
+  }
+
+  .section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 40px rgba(0,255,224,0.6);
+  }
+
+  h2 {
+    color: #00ffe0;
+    margin-bottom: 15px;
+  }
+
+  ul {
+    padding-left: 20px;
+    text-align: left;
+  }
+
+  .welcome-section {
+    margin: 20px 0;
+    font-size: 1.3em;
+    color: #fff;
+  }
+
+  footer {
+    margin-top: 70px;
+    text-align: center;
+    color: #00ffe0;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<div id="tsparticles"></div>
+
+<div class="home-container">
+  <h1>Bienvenue sur <%= serverName %></h1>
+
+  <div class="welcome-section">
+    <% if(user){ %>
+      <p>Bonjour <strong><%= user.username %></strong> ! Ravi de te revoir sur Luménia.</p>
+    <% } else { %>
+      <p>Rejoins notre communauté et découvre toutes les fonctionnalités exclusives pour les membres connectés.</p>
+    <% } %>
+  </div>
+
+  <div id="date-time" class="date-time"></div>
+
+  <% if(!user){ %>
+    <button class="btn-connect" onclick="window.location='/login'">Se connecter avec Discord</button>
+  <% } else { %>
+    <button class="btn-connect" onclick="window.location='/profil'">Aller au Dashboard</button>
+  <% } %>
+
+  <!-- Liens utiles -->
+  <div class="links">
+    <button class="btn-twitch" onclick="window.open('https://www.twitch.tv/klyze_03','_blank')">Twitch</button>
+    <button class="btn-discord" onclick="window.open('https://discord.gg/mzf7wrHjB5','_blank')">Discord</button>
+    <button class="btn-donate" onclick="window.open('https://paypal.me/klyze03?country.x=FR&locale.x=fr_FR','_blank')">Faire un don</button>
+    <button class="btn-bump" onclick="window.open('https://disboard.org/server/1418971734023078055S/bump','_blank')">Bump le serveur</button>
+  </div>
+
+  <div class="extra-info">
+    <section class="section">
+      <h2>Nouveautés</h2>
+      <p>Découvre toutes les nouvelles fonctionnalités, annonces importantes et améliorations de notre serveur.</p>
+    </section>
+
+    <section class="section">
+      <h2>Avantages des membres</h2>
+      <p>Profite de salons exclusifs, de rôles spéciaux, de giveaways et de contenus réservés aux membres.</p>
+    </section>
+
+    <section class="section">
+      <h2>Conseils pour bien commencer</h2>
+      <ul>
+        <li>Connecte ton compte Discord</li>
+        <li>Personnalise ton profil et avatar</li>
+        <li>Explore les salons et rôles disponibles</li>
+        <li>Participe aux discussions et événements</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Présentation du serveur</h2>
+      <p>Lumenia est une communauté active et fun où tu peux rencontrer de nouveaux amis et participer à des activités diverses.</p>
+    </section>
+  </div>
+</div>
+
+<footer>
+  Site fait par le responsable du serveur Luménia et est soumis aux droits d'auteurs.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="/script.js"></script>
+<script>
+  // Affichage dynamique de la date
+  const dateTimeEl = document.getElementById('date-time');
+  function updateDateTime() {
+    const now = new Date();
+    dateTimeEl.textContent = `Nous sommes le ${now.toLocaleDateString()}`;
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 60000);
+
+  // Particules animées
+  tsParticles.load("tsparticles", {
+    fpsLimit: 60,
+    interactivity: {
+      events: {
+        onHover: { enable: true, mode: "repulse" },
+        onClick: { enable: true, mode: "push" }
+      },
+      modes: {
+        repulse: { distance: 120, duration: 0.4 },
+        push: { quantity: 4 }
+      }
+    },
+    particles: {
+      color: { value: "#00ffe0" },
+      links: { color: "#00ffe0", distance: 150, enable: true, opacity: 0.5, width: 1 },
+      collisions: { enable: true },
+      move: { enable: true, speed: 2, outModes: { default: "bounce" } },
+      number: { density: { enable: true, area: 900 }, value: 80 },
+      opacity: { value: 0.7 },
+      shape: { type: "circle" },
+      size: { value: { min: 2, max: 4 } }
+    },
+    detectRetina: true
+  });
+</script>
+
+</body>
+
+<!-- Ajoute ceci juste après <body> -->
+<div id="dino-easter" title="Clique pour jouer au jeu du dinosaure" style="
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  font-size: 2em;
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.3s;
+">🦖</div>
+
+<script>
+  const dino = document.getElementById("dino-easter");
+  dino.addEventListener("mouseenter", () => {
+    dino.style.transform = "scale(1.3) rotate(15deg)";
+  });
+  dino.addEventListener("mouseleave", () => {
+    dino.style.transform = "scale(1) rotate(0deg)";
+  });
+  dino.addEventListener("click", () => {
+    // Lance le jeu du dinosaure en plein écran
+    alert("Prépare-toi ! Appuie sur ESPACE pour commencer le jeu !");
+    window.open("https://chromedino.com/", "_blank");
+  });
+</script>
+
+</html>
