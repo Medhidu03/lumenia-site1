@@ -9,7 +9,6 @@ const { Client } = require("pg"); // ✅ PostgreSQL
 const app = express();
 
 // ----- POSTGRESQL / RENDER -----
-// Utilise la DATABASE_URL de Render ou une valeur de secours
 const client = new Client({
     connectionString: process.env.DATABASE_URL || 'postgresql://monsitediscord_user:zikXQa5TkPx41Jpdbjkd98DIvfcDeLnx@dpg-d38pgk3uibrs73a11f50-a/monsitediscord',
     ssl: { rejectUnauthorized: false }
@@ -70,7 +69,6 @@ app.get("/profil", checkAuth, async (req, res) => {
     const timestamp = ((BigInt(discordId) >> 22n) + BigInt(discordEpoch));
     const creationDate = new Date(Number(timestamp));
 
-    // Exemple : récupérer ou stocker des données en DB
     try {
         await client.query(
             "INSERT INTO users (discord_id, username) VALUES ($1, $2) ON CONFLICT (discord_id) DO NOTHING",
@@ -107,7 +105,7 @@ app.use((req, res, next) => {
 });
 
 // ----- LANCEMENT SERVEUR -----
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Render fournit process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Serveur lancé sur le port ${PORT}`);
+    console.log(`Serveur lancé sur le port ${PORT} (Render fournit PORT=${process.env.PORT})`);
 });
