@@ -9,7 +9,7 @@ const app = express();
 
 // ----- SESSION -----
 app.use(session({
-    secret: "secret_ultra_complexe",
+    secret: process.env.SESSION_SECRET || "secret_ultra_complexe",
     resave: false,
     saveUninitialized: false
 }));
@@ -32,8 +32,8 @@ passport.use(new DiscordStrategy({
 
 // ----- EXPRESS -----
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views")); // dossier EJS
-app.use(express.static(path.join(__dirname, "public"))); // dossier front-end statique
+app.set("views", path.join(__dirname, "views")); 
+app.use(express.static(path.join(__dirname, "public"))); 
 
 // ----- ROUTES -----
 app.get("/", (req, res) => {
@@ -77,12 +77,11 @@ function checkAuth(req, res, next) {
     res.redirect("/");
 }
 
-// ----- FRONT-END SPA (pour pages statiques dans public) -----
-app.get("*", (req, res, next) => {
-    // Ignore les routes déjà définies
+// ----- FRONT-END SPA / pages statiques -----
+// Toutes les routes non définies sont redirigées vers index.html
+app.use((req, res, next) => {
     const definedRoutes = ["/", "/profil", "/login", "/callback", "/logout"];
     if (definedRoutes.includes(req.path)) return next();
-    // Redirige les autres vers index.html
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
