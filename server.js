@@ -3,6 +3,7 @@ const session = require("express-session");
 const passport = require("passport");
 const DiscordStrategy = require("passport-discord").Strategy;
 require("dotenv").config();
+const path = require("path");
 
 const app = express();
 
@@ -24,14 +25,15 @@ passport.use(new DiscordStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: process.env.CALLBACK_URL,
-    scope: ["identify"] // Plus besoin de "guilds"
+    scope: ["identify"]
 }, (accessToken, refreshToken, profile, done) => {
     process.nextTick(() => done(null, profile));
 }));
 
 // ----- EXPRESS -----
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.set("views", path.join(__dirname, "views")); // dossier EJS
+app.use(express.static(path.join(__dirname, "public"))); // dossier front-end statique
 
 // ----- ROUTES -----
 app.get("/", (req, res) => {
@@ -40,7 +42,7 @@ app.get("/", (req, res) => {
         serverName: "Lumenia",
         twitchLink: "https://www.twitch.tv/klyze_03",
         discordLink: "https://discord.gg/mzf7wrHjB5",
-        date: new Date() // pour afficher la date sur la page d'accueil
+        date: new Date()
     });
 });
 
@@ -51,9 +53,8 @@ app.get("/callback", passport.authenticate("discord", { failureRedirect: "/" }),
 });
 
 app.get("/profil", checkAuth, (req, res) => {
-    // Calculer la date de création du compte Discord
     const discordId = req.user.id;
-    const discordEpoch = 1420070400000; // Epoch Discord (1er Janvier 2015)
+    const discordEpoch = 1420070400000;
     const timestamp = ((BigInt(discordId) >> 22n) + BigInt(discordEpoch));
     const creationDate = new Date(Number(timestamp));
 
@@ -62,7 +63,7 @@ app.get("/profil", checkAuth, (req, res) => {
         serverName: "Lumenia",
         discordLink: "https://discord.gg/mzf7wrHjB5",
         twitchLink: "https://www.twitch.tv/klyze_03",
-        creationDate // Date de création du compte Discord
+        creationDate
     });
 });
 
@@ -76,7 +77,17 @@ function checkAuth(req, res, next) {
     res.redirect("/");
 }
 
+// ----- FRONT-END SPA (pour pages statiques dans public) -----
+app.get("*", (req, res, next) => {
+    // Ignore les routes déjà définies
+    const definedRoutes = ["/", "/profil", "/login", "/callback", "/logout"];
+    if (definedRoutes.includes(req.path)) return next();
+    // Redirige les autres vers index.html
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 // ----- LANCEMENT SERVEUR -----
-app.listen(3000, () => {
-    console.log("Serveur lancé sur http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Serveur lancé sur le port ${PORT}`);
 });
