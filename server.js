@@ -35,7 +35,7 @@ passport.deserializeUser((obj, done) => done(null, obj));
 passport.use(new DiscordStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: process.env.CALLBACK_URL,
+    callbackURL: process.env.CALLBACK_URL, // doit être l’URL publique Render
     scope: ["identify"]
 }, (accessToken, refreshToken, profile, done) => {
     process.nextTick(() => done(null, profile));
@@ -105,7 +105,7 @@ app.use((req, res, next) => {
 });
 
 // ----- LANCEMENT SERVEUR -----
-const PORT = process.env.PORT || 3000; // Render fournit process.env.PORT
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Serveur lancé sur le port ${PORT} (Render fournit PORT=${process.env.PORT})`);
 });
