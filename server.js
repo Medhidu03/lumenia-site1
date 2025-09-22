@@ -4,8 +4,20 @@ const passport = require("passport");
 const DiscordStrategy = require("passport-discord").Strategy;
 require("dotenv").config();
 const path = require("path");
+const { Client } = require("pg"); // ✅ PostgreSQL
 
 const app = express();
+
+// ----- POSTGRESQL / RENDER -----
+// Utilise la DATABASE_URL de Render ou une valeur de secours
+const client = new Client({
+    connectionString: process.env.DATABASE_URL || 'postgresql://monsitediscord_user:zikXQa5TkPx41Jpdbjkd98DIvfcDeLnx@dpg-d38pgk3uibrs73a11f50-a/monsitediscord',
+    ssl: { rejectUnauthorized: false }
+});
+
+client.connect()
+    .then(() => console.log("Connecté à PostgreSQL Render"))
+    .catch(err => console.error("Erreur connexion DB:", err));
 
 // ----- SESSION -----
 app.use(session({
@@ -52,11 +64,21 @@ app.get("/callback", passport.authenticate("discord", { failureRedirect: "/" }),
     res.redirect("/profil");
 });
 
-app.get("/profil", checkAuth, (req, res) => {
+app.get("/profil", checkAuth, async (req, res) => {
     const discordId = req.user.id;
     const discordEpoch = 1420070400000;
     const timestamp = ((BigInt(discordId) >> 22n) + BigInt(discordEpoch));
     const creationDate = new Date(Number(timestamp));
+
+    // Exemple : récupérer ou stocker des données en DB
+    try {
+        await client.query(
+            "INSERT INTO users (discord_id, username) VALUES ($1, $2) ON CONFLICT (discord_id) DO NOTHING",
+            [discordId, req.user.username]
+        );
+    } catch(err) {
+        console.error("Erreur DB utilisateur:", err);
+    }
 
     res.render("profil", { 
         user: req.user, 
@@ -78,7 +100,6 @@ function checkAuth(req, res, next) {
 }
 
 // ----- FRONT-END SPA / pages statiques -----
-// Toutes les routes non définies sont redirigées vers index.html
 app.use((req, res, next) => {
     const definedRoutes = ["/", "/profil", "/login", "/callback", "/logout"];
     if (definedRoutes.includes(req.path)) return next();
